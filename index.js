@@ -9,9 +9,10 @@ express()
   .set('view engine', 'ejs')
   .get('/', (req, res) => res.render('pages/index'))
   .get('/cool', (req, res) => res.send(cool()))
-  .post('/cool', (req, res) => res.send(cool()))
   .get('/times', (req, res) => res.send(showTimes()))
   .get('/lunch', (req, res) => res.send(getLunch()))
+  .get('/menu/haverford/todayMenu', (req, res) => res.send(menuHaverfordTodayMenu()))
+  .get('/menu/brynmawr/todayMenu', (req, res) => res.send(menuBrynMawrTodayMenu()))
   .post('/menu', function(req, res) {
     var timezone = req.body.timezone;
     var time_to_show = req.body.last_clicked_button_name;
@@ -61,33 +62,47 @@ express()
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
     
+
+menuBrynMawrTodayMenu = () => {
+
+  let dummyJSON = {
+    "messages": [
+      {"text": "February 3, 2021"},
+      {"text": "Lunch"},
+      {"text": "Fire Roasted Tomato Soup, Grilled American Cheese Sandwich*, Buffalo Tofu Wings V, Sundried Tomato, Artichoke & Swiss Frittata, Turkey Bacon, Shoestring Fries*, Chefs Choice Vegetabl, Potato Chips, Vegan Vanilla Cupcakes , Chocolate Chip Cookies*"},
+      {"text": "Dinner"},
+      {"text": "Louisiana Spiced Tofu V, Cajun Marinated Chicken Breast, Seasoned Baby Carrots, Dirty Rice V, Garlic Bread, Split-Top Dinner Roll*, Pasta Bar : Spaghetti, Marinara Sauce, Meat Sauce, Deep Chocolate Cake V, Lemon Cake*"}
+    ]
+    };
     
+  return dummyJSON;
+}
+
+menuHaverfordTodayMenu = () => {
+
+  let dummyJSON = {
+    "messages": [
+      {"text": "February 3, 2021"},
+      {"text": "Brunch"},
+      {"text": "10:00 AM: Pancakes, Scrambled Eggs, Tofu Scrambled, Vegan Sausage, Turkey Sausage Links, Diced Potatoes, Bagels, Muffins"},
+      {"text": "11:30 AM, Grilled Turkey & Swiss Sundried Tomato Melt, Singapore Street Noodles , Roasted Red Potatoes , Roasted Vegetables, Pizza"},
+      {"text": "Dinner"},
+      {"text": "Grilled Flank Steak Chimichurri, Cauliflower Rice Burrito Skillet, Mexican Corn, Chipotle Roasted Potatoes, Grilled Chicken Breast, Pasta & Sauce, Pizza"}
+    ]
+    };
+    
+  return dummyJSON;
+}
 
 getLunch = () => {
 
   let dummyJSON = {
-    "user1" : {
-       "name" : "mahesh",
-       "password" : "password1",
-       "profession" : "teacher",
-       "id": 1
-    },
-    
-    "user2" : {
-       "name" : "suresh",
-       "password" : "password2",
-       "profession" : "librarian",
-       "id": 2
-    },
-    
-    "user3" : {
-       "name" : "ramesh",
-       "password" : "password3",
-       "profession" : "clerk",
-       "id": 3
-    }
- }
-
+    "messages": [
+      {"text": "Welcome to the Chatfuel Rockets!"},
+      {"text": "What are you up to?"}
+    ]
+   }
+   
   return dummyJSON;
 }
   
