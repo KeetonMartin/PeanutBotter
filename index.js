@@ -9,10 +9,59 @@ express()
   .set('view engine', 'ejs')
   .get('/', (req, res) => res.render('pages/index'))
   .get('/cool', (req, res) => res.send(cool()))
+  .post('/cool', (req, res) => res.send(cool()))
   .get('/times', (req, res) => res.send(showTimes()))
   .get('/lunch', (req, res) => res.send(getLunch()))
+  .post('/menu', function(req, res) {
+    var timezone = req.body.timezone;
+    var time_to_show = req.body.last_clicked_button_name;
+
+    let dummyJSON = {
+      "Haverford" : {
+         "breakfast" : `WEEK 1
+                        10:00 AM
+                        French Toast Sticks
+                        Scrambled Eggs
+                        Tofu Scrambled
+                        Vegan Sausage
+                        Sausage Patties
+                        Shredded Potato
+                        Bagels, Muffins 
+                        
+                        11:30 AM
+                        Beef Burger
+                        Beyond Burger
+                        Boardwalk Fries
+                        Broccoli
+                        Pizza    `,
+         "lunch" : "None",
+         "dinner" : `Four Cheese Beef Lasagna
+                    Spaghetti Squash Primavera
+                    Potatoes Parmesan
+                    Ratatouille
+                    Garlic Bread
+                    Grilled Chicken Breast
+                    Pasta & Sauce
+                    Pizza`,
+      }}
+
+      let returnJSON = {
+        "messages": [
+          {"text": ""}
+        ]
+       }
+      if(time_to_show=="Menu right now"){
+        returnJSON.messages[0].text = dummyJSON.Haverford.breakfast;
+      }
+      else{
+        returnJSON.messages[0].text = "Breakfast:\n" + dummyJSON.Haverford.breakfast + "\n Lunch:\n" + dummyJSON.Haverford.lunch + "\n Dinner:\n" + dummyJSON.Haverford.dinner;
+      }
+    
+      res.send(returnJSON)})
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
+    
+    
 
 getLunch = () => {
 
