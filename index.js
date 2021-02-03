@@ -84,6 +84,12 @@ express()
     }
     };
 
+
+    let returnJSON = {
+      "messages": [
+        {"text": "Test"}
+      ]
+     }
     if(time_to_show=="Full menu today"){ // Show full day menu
       returnJSON.messages[0].text = "Breakfast:\n" + menuJSON[college].breakfast + "\n\nLunch:\n" + menuJSON[college].lunch + "\n\nDinner:\n" + menuJSON[college].dinner;
     }
@@ -108,11 +114,7 @@ express()
     };
 
 
-    let returnJSON = {
-        "messages": [
-          {"text": "Test"}
-        ]
-       }
+    
       
     
     res.send(returnJSON)})
