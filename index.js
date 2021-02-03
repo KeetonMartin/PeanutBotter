@@ -36,9 +36,9 @@ async function scrapeHCDining(url){
   });
 
   HCDiningFinal = {
-      Breakfast: [],
-      Lunch: [],
-      Dinner: [],
+      breakfast: [],
+      lunch: [],
+      dinner: [],
   };
 
   let currentDate = new Date();
@@ -46,16 +46,16 @@ async function scrapeHCDining(url){
   if (currentDate.getDay() == 0 || currentDate.getDay() == 6 || (currentDate.getDate() < 8 && currentDate.getMonth() == 1)){
       data[0].splice(0, 2)
       data[1].splice(0, 2)
-      HCDiningFinal.Lunch = data[0]
-      HCDiningFinal.Dinner = data[1]
+      HCDiningFinal.lunch = data[0]
+      HCDiningFinal.dinner = data[1]
   }
   else{
       data[0].splice(0, 2)
       data[1].splice(0, 2)
       data[2].splice(0, 2)
-      HCDiningFinal.Breakfast = data[0]
-      HCDiningFinal.Lunch = data[1]
-      HCDiningFinal.Dinner = data[2]
+      HCDiningFinal.breakfast = data[0]
+      HCDiningFinal.lunch = data[1]
+      HCDiningFinal.dinner = data[2]
   }
 
   console.log(HCDiningFinal);
@@ -187,7 +187,7 @@ express()
     }
     else{
       full_date = new Date(req.body.needed_time);
-      full_date.setHours(date.getHours() -5);
+      full_date.setHours(full_date.getHours() -5);
       day_needed = full_date.getDay();
     }
     let college = req.body.college;
@@ -216,8 +216,8 @@ express()
     console.log(returnJSON);
     res.send(returnJSON)})
   .post('/menu', function(req, res) {
-    console.log(req);
-    console.log(req.body);
+    // console.log(req);
+    // console.log(req.body);
  
     let full_date = new Date();
     let current_hour = full_date.getHours;
