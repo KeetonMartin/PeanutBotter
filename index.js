@@ -248,11 +248,14 @@ function compareTime(time1, time2) {
 }
 
 function getBus(date, college, time) {
-  if (college == 'Haverford'){
+  console.log(college);
+  if (college == "Haverford"){
     console.log("got inside getBus for Haverford");
+    console.log("dataFinal: ", dataFinal);
       for (let index = 0; index < dataFinal[date].length; index ++){
           if (compareTime(time, dataFinal[date][index].departingBMC)){
-              var bussesArray = []
+              console.log("got inside if in the loop");
+              var bussesArray = [];
               bussesArray.push({departingBrynMawr: dataFinal[date][index].departingBMC, arrivingAtHaverford: dataFinal[date][index].arrivingHC});
               bussesArray.push({departingBrynMawr: dataFinal[date][index + 1].departingBMC, arrivingAtHaverford: dataFinal[date][index + 1].arrivingHC});
               bussesArray.push({departingBrynMawr: dataFinal[date][index + 2].departingBMC, arrivingAtHaverford: dataFinal[date][index + 2].arrivingHC});
@@ -267,7 +270,7 @@ function getBus(date, college, time) {
     console.log("got inside getBus for BrynMawr");
       for (let index = 0; index < dataFinal[date].length; index ++){
           if (compareTime(time, dataFinal[date][index].departingHC)){
-              var bussesArray = []
+              var bussesArray = [];
               bussesArray.push({departingHaverford: dataFinal[date][index].departingHC, arrivingAtBrynMawr: dataFinal[date][index].arrivingBMC});
               bussesArray.push({departingHaverford: dataFinal[date][index + 1].departingHC, arrivingAtBrynMawr: dataFinal[date][index + 1].arrivingBMC});
               bussesArray.push({departingHaverford: dataFinal[date][index + 2].departingHC, arrivingAtBrynMawr: dataFinal[date][index + 2].arrivingBMC});
