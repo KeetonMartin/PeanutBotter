@@ -3,8 +3,8 @@ const path = require('path')
 const PORT = process.env.PORT || 5000
 const cool = require('cool-ascii-faces');
 const bodyParser = require('body-parser');
-
-
+const puppeteer = require('puppeteer');
+var dataFinal = {};
 express()
   .use(bodyParser.urlencoded({ extended: true }))
   .use(bodyParser.json())
@@ -17,6 +17,32 @@ express()
   .get('/lunch', (req, res) => res.send(getLunch()))
   .get('/menu/haverford/todayMenu', (req, res) => res.send(menuHaverfordTodayMenu()))
   .get('/menu/brynmawr/todayMenu', (req, res) => res.send(menuBrynMawrTodayMenu()))
+  .post('/busses', function(req, res) {
+    let current_timestamp = Date.now();
+
+    if(req.body.last_clicked_button_name=="ASAP"){
+      let full_date = new Date(current_timestamp);
+      let day_needed = full_date.getDay;
+    }
+    else{
+      let full_date = new Date(req.body.datetime);
+      let day_needed = full_date.getDay;
+    }
+    let college = req.body.college;
+    var resultBusQuery = getBus(day_needed, college, full_date);
+    let returnJSON = {
+      "messages": [
+        {"text": "Here are the next available busses after " + full_date.toUTCString()+ " :"}
+      ]
+     }
+    var text_message = "";
+    for(var i=0; i<resultBusQuery.length; i++){
+        text_message = text_message + resultBusQuery[i];
+     }
+    returnJSON.messages[0].push(text_message);
+    
+    console.log(resultJSON);
+    res.send(resultJSON)})
   .post('/menu', function(req, res) {
     console.log(req);
     console.log(req.body);
@@ -72,16 +98,16 @@ express()
         Pasta & Sauce
         Pizza`,
       },
-    "Swarthmore":{
+      "Swarthmore":{
       "breakfast":"Eggs, bacon",
       "lunch": "Chicken noodle soup",
       "dinner": "Pesto pasta, salmon"
-    },
-    "BrynMawr":{
-      "breakfast": "Pancakes",
-      "lunch": "Mushroom cream soup",
-      "dinner": "Tacos"
-    }
+      },
+      "BrynMawr":{
+        "breakfast": "Pancakes",
+        "lunch": "Mushroom cream soup",
+        "dinner": "Tacos"
+      }
     };
 
 
@@ -90,6 +116,8 @@ express()
         {"text": "Test"}
       ]
      }
+
+
     if(time_to_show=="Full menu today"){ // Show full day menu
       returnJSON.messages[0].text = "Breakfast:\n" + menuJSON[college].breakfast + "\n\nLunch:\n" + menuJSON[college].lunch + "\n\nDinner:\n" + menuJSON[college].dinner;
     }
@@ -120,7 +148,123 @@ express()
     res.send(returnJSON)})
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
+let variables_to_text_dictionary = {
+  "departingHaverford": "Departing Haverford: ",
+  "departingBrynMawr": "Departing Bryn Mawr: ",
+  "departingSwarthmore": "Departing Swarthmore:",
+  "arrivingAtBrynMawr": "Arriving at Bryn Mawr: ",
+  "arrivingAtHaverford": "Arriving at Haverford: ",
+  "arrivingAtSwarthmore": "Arriving at Swarthmore: ",
+}
+
+  async function scrapeProduct(url){
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.goto(url);
+
+    const data = await page.evaluate(() => {
+            const tds = Array.from(document.querySelectorAll('table tr td'))
+            return tds.map(td => td.innerText)
+    });
+
+    data.splice(0,5); // removing the first 5 elements 
+    // console.log(data.length)
+
+    dataFinal = { // 0 is Sunday, 6 is Saturday
+        1:[],
+        2:[],
+        3:[],
+        4:[],
+        5:[]
+    }
+
+    for (let index = 0; index <= 1152; index += 4) {
+        if (index <= 232){
+            dataFinal["Monday"].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
+        }
+        else if (index > 232 && index <= 468){
+            dataFinal["Tuesday"].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
+        }
+        else if (index > 468 && index <= 704){
+            dataFinal["Wednesday"].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
+        }
+        else if (index > 704 && index <= 940){
+            dataFinal["Thursday"].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
+        }
+        else {
+            dataFinal["Friday"].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
+        }
+    }
+
+    // console.log(dataFinal);
+
     
+
+    
+
+
+    await browser.close();
+}
+
+scrapeProduct('https://www.brynmawr.edu/transportation/blue-bus-bi-co');
+
+
+function compareTime(time1, time2) {
+  let t1 = new Date();
+
+  if (time2[1] == ':'){
+      if (time2[4] == 'p'){
+          t1.setHours(parseInt(time2[0]) + 12, time2[2]+time2[3], 0);
+      }
+      else{
+          t1.setHours(time2[0], time2[2]+time2[3], 0)
+      }
+  }
+  else{
+      if (time2[5] == 'p' && parseInt(time2[0]+time2[1]) == 12){
+          t1.setHours(parseInt(time2[0]+time2[1]), time2[3]+time2[4], 0);
+      }
+      else if (time2[5] == 'p' && !(parseInt(time2[0]+time2[1]) == 12)){
+          t1.setHours(parseInt(time2[0]+time2[1]) + 12, time2[3]+time2[4], 0);
+      }
+      else{
+          t1.setHours(time2[0], time2[2]+time2[3], 0)
+      }
+  }
+
+  return time1 < t1
+  
+}
+
+function getBus(date, destination, time) {
+  if (destination == 'Haverford'){
+      for (let index = 0; index < dataFinal[date].length; index ++){
+          if (compareTime(time, dataFinal[date][index].departingBMC)){
+              var bussesArray = []
+              bussesArray.push({departingBrynMawr: dataFinal[date][index].departingBMC, arrivingAtHaverford: dataFinal[date][index].arrivingHC});
+              bussesArray.push({departingBrynMawr: dataFinal[date][index + 1].departingBMC, arrivingAtHaverford: dataFinal[date][index + 1].arrivingHC});
+              bussesArray.push({departingBrynMawr: dataFinal[date][index + 2].departingBMC, arrivingAtHaverford: dataFinal[date][index + 2].arrivingHC});
+              return bussesArray
+
+              // return [dataFinal[date][index].departingBMC, dataFinal[date][index + 1].departingBMC, dataFinal[date][index + 2].departingBMC]
+          }
+      }
+  }
+  else if (destination == "BrynMawr"){
+      for (let index = 0; index < dataFinal[date].length; index ++){
+          if (compareTime(time, dataFinal[date][index].departingHC)){
+              var bussesArray = []
+              bussesArray.push({departingHaverford: dataFinal[date][index].departingHC, arrivingAtBrynMawr: dataFinal[date][index].arrivingBMC});
+              bussesArray.push({departingHaverford: dataFinal[date][index + 1].departingHC, arrivingAtBrynMawr: dataFinal[date][index + 1].arrivingBMC});
+              bussesArray.push({departingHaverford: dataFinal[date][index + 2].departingHC, arrivingAtBrynMawr: dataFinal[date][index + 2].arrivingBMC});
+              return bussesArray
+              // return [dataFinal[date][index].departingHC, dataFinal[date][index + 1].departingHC, dataFinal[date][index + 2].departingHC]
+          }
+      }
+  }
+  
+}
+
 
 menuBrynMawrTodayMenu = () => {
 

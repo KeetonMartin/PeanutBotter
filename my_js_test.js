@@ -57,8 +57,8 @@ let menuJSON = {
   };
 
 let time_to_show = "Full menu today";
-var college = "Swarthmore";
-if(time_to_show=="Full menu today"){ // Show full day menu
+var college = "BrynMawr";
+if(time_to_show=="Full  today"){ // Show full day menu
     console.log("Breakfast:\n" + menuJSON[college].breakfast + "\n\nLunch:\n" + menuJSON[college].lunch + "\n\nDinner:\n" + menuJSON[college].dinner);
 }
 else{ // Show menu at the current time
