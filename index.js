@@ -2,7 +2,8 @@ const express = require('express')
 const path = require('path')
 const PORT = process.env.PORT || 5000
 const cool = require('cool-ascii-faces');
-
+const bodyParser = require('body-parser');
+express.use(bodyParser);
 express()
   .use(express.static(path.join(__dirname, 'public')))
   .set('views', path.join(__dirname, 'views'))
@@ -14,6 +15,10 @@ express()
   .get('/menu/haverford/todayMenu', (req, res) => res.send(menuHaverfordTodayMenu()))
   .get('/menu/brynmawr/todayMenu', (req, res) => res.send(menuBrynMawrTodayMenu()))
   .post('/menu', function(req, res) {
+
+    console.log(body);
+    
+    
     var timezone = req.body.timezone;
     var time_to_show = req.body.last_clicked_button_name;
 
@@ -44,11 +49,11 @@ express()
                     Grilled Chicken Breast
                     Pasta & Sauce
                     Pizza`,
-      }}
+      }};
 
-      let returnJSON = {
+    let returnJSON = {
         "messages": [
-          {"text": ""}
+          {"text": "Test"}
         ]
        }
       if(time_to_show=="Menu right now"){
@@ -56,9 +61,9 @@ express()
       }
       else{
         returnJSON.messages[0].text = "Breakfast:\n" + dummyJSON.Haverford.breakfast + "\n Lunch:\n" + dummyJSON.Haverford.lunch + "\n Dinner:\n" + dummyJSON.Haverford.dinner;
-      }
+      };
     
-      res.send(returnJSON)})
+    res.send(returnJSON)})
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
     
