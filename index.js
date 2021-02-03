@@ -20,12 +20,13 @@ express()
   .post('/busses', function(req, res) {
     let current_timestamp = Date.now();
     var day_needed;
+    var full_date;
     if(req.body.last_clicked_button_name=="ASAP"){
-      let full_date = new Date(current_timestamp);
+      full_date = new Date(current_timestamp);
       day_needed = full_date.getDay();
     }
     else{
-      let full_date = new Date(req.body.datetime);
+      full_date = new Date(req.body.datetime);
       day_needed = full_date.getDay();
     }
     let college = req.body.college;
