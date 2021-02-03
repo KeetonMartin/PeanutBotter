@@ -18,7 +18,7 @@ dataFinal = scrapeProduct('https://www.brynmawr.edu/transportation/blue-bus-bi-c
 
 async function scrapeProduct(url){
   // const browser = await puppeteer.launch();
-  const browser = await puppeteer.launch({ignoreDefaultArgs: ['--disable-extensions']});
+  const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
   const page = await browser.newPage();
   await page.goto(url);
 
