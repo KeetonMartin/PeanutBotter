@@ -19,14 +19,14 @@ express()
   .get('/menu/brynmawr/todayMenu', (req, res) => res.send(menuBrynMawrTodayMenu()))
   .post('/busses', function(req, res) {
     let current_timestamp = Date.now();
-
+    var day_needed;
     if(req.body.last_clicked_button_name=="ASAP"){
       let full_date = new Date(current_timestamp);
-      let day_needed = full_date.getDay;
+      day_needed = full_date.getDay();
     }
     else{
       let full_date = new Date(req.body.datetime);
-      let day_needed = full_date.getDay;
+      day_needed = full_date.getDay();
     }
     let college = req.body.college;
     var resultBusQuery = getBus(day_needed, college, full_date);
