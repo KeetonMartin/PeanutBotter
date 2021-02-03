@@ -4,10 +4,63 @@ const PORT = process.env.PORT || 5000
 const cool = require('cool-ascii-faces');
 const bodyParser = require('body-parser');
 const puppeteer = require('puppeteer');
-var dataFinal = {};
 
 //For Keeton
 const fetch = require('node-fetch');
+var dataFinal =  { // 0 is Sunday, 6 is Saturday
+  1:[],
+  2:[],
+  3:[],
+  4:[],
+  5:[]
+}
+dataFinal = scrapeProduct('https://www.brynmawr.edu/transportation/blue-bus-bi-co');
+
+async function scrapeProduct(url){
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  await page.goto(url);
+
+  const data = await page.evaluate(() => {
+          const tds = Array.from(document.querySelectorAll('table tr td'))
+          return tds.map(td => td.innerText)
+  });
+
+  data.splice(0,5); // removing the first 5 elements 
+  // console.log(data.length)
+
+  dataFinal = { // 0 is Sunday, 6 is Saturday
+      1:[],
+      2:[],
+      3:[],
+      4:[],
+      5:[]
+  }
+
+  for (let index = 0; index <= 1152; index += 4) {
+      if (index <= 232){
+          dataFinal[1].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
+      }
+      else if (index > 232 && index <= 468){
+          dataFinal[2].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
+      }
+      else if (index > 468 && index <= 704){
+          dataFinal[3].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
+      }
+      else if (index > 704 && index <= 940){
+          dataFinal[4].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
+      }
+      else {
+          dataFinal[5].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
+      }
+  }
+  console.log("done with scraping!");
+  console.log(dataFinal);
+  // console.log(dataFinal);
+  
+  await browser.close();
+  return dataFinal;
+}
 
 express()
   .use(bodyParser.urlencoded({ extended: true }))
@@ -49,8 +102,7 @@ express()
       console.log("message out:" + composedMessage["messages"][0]["text"]);
 
       res.send(composedMessage);
-  })
-
+      })
   })
   // .post('/busses', function(req, res) {
   //   let current_timestamp = Date.now();
@@ -76,9 +128,39 @@ express()
   //       text_message = text_message + resultBusQuery[i];
   //    }
   //   returnJSON.messages[0].push(text_message);
+  .post('/busses', function(req, res) {
+    let current_timestamp = Date.now();
+    var day_needed;
+    var full_date;
+    if(req.body.last_clicked_button_name=="ASAP"){
+      full_date = new Date(current_timestamp);
+      day_needed = full_date.getDay();
+    }
+    else{
+      full_date = new Date(req.body.needed_time);
+      day_needed = full_date.getDay();
+    }
+    let college = req.body.college;
+
+    console.log("day needed: ", day_needed);
+    console.log("full date: ", full_date);
+    console.log("college: ", college);
+    console.log("datetime: ", req.body.needed_time);
+    var resultBusQuery = getBus(day_needed, college, full_date);
+    console.log("resultBusQuery: ", resultBusQuery);
+    let returnJSON = {
+      "messages": [
+        {"text": "Here are the next available busses after " + full_date.toUTCString()+ " :"}
+      ]
+     }
+    var text_message = "";
+    for(var i=0; i<resultBusQuery.length; i++){
+        text_message = text_message + resultBusQuery[i];
+     }
+    returnJSON.messages[0].push(text_message);
     
-  //   console.log(resultJSON);
-  //   res.send(resultJSON)})
+    console.log(resultJSON);
+    res.send(resultJSON)})
   .post('/menu', function(req, res) {
     console.log(req);
     console.log(req.body);
@@ -193,58 +275,6 @@ let variables_to_text_dictionary = {
   "arrivingAtSwarthmore": "Arriving at Swarthmore: ",
 }
 
-//   async function scrapeProduct(url){
-//     const browser = await puppeteer.launch();
-//     const page = await browser.newPage();
-//     await page.goto(url);
-
-//     const data = await page.evaluate(() => {
-//             const tds = Array.from(document.querySelectorAll('table tr td'))
-//             return tds.map(td => td.innerText)
-//     });
-
-//     data.splice(0,5); // removing the first 5 elements 
-//     // console.log(data.length)
-
-//     dataFinal = { // 0 is Sunday, 6 is Saturday
-//         1:[],
-//         2:[],
-//         3:[],
-//         4:[],
-//         5:[]
-//     }
-
-//     for (let index = 0; index <= 1152; index += 4) {
-//         if (index <= 232){
-//             dataFinal["Monday"].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
-//         }
-//         else if (index > 232 && index <= 468){
-//             dataFinal["Tuesday"].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
-//         }
-//         else if (index > 468 && index <= 704){
-//             dataFinal["Wednesday"].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
-//         }
-//         else if (index > 704 && index <= 940){
-//             dataFinal["Thursday"].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
-//         }
-//         else {
-//             dataFinal["Friday"].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
-//         }
-//     }
-
-//     // console.log(dataFinal);
-
-    
-
-    
-
-
-//     await browser.close();
-// }
-
-// scrapeProduct('https://www.brynmawr.edu/transportation/blue-bus-bi-co');
-
-
 function compareTime(time1, time2) {
   let t1 = new Date();
 
@@ -264,40 +294,48 @@ function compareTime(time1, time2) {
           t1.setHours(parseInt(time2[0]+time2[1]) + 12, time2[3]+time2[4], 0);
       }
       else{
-          t1.setHours(time2[0], time2[2]+time2[3], 0)
+          t1.setHours(time2[0], time2[2]+time2[3], 0);
       }
   }
-
-  return time1 < t1
+  console.log("return from compareTime: ", time1 < t1);
+  return time1 < t1;
   
 }
 
-function getBus(date, destination, time) {
-  if (destination == 'Haverford'){
+function getBus(date, college, time) {
+  console.log(college);
+  if (college == "Haverford"){
+    console.log("got inside getBus for Haverford");
+    console.log("dataFinal: ", dataFinal);
       for (let index = 0; index < dataFinal[date].length; index ++){
           if (compareTime(time, dataFinal[date][index].departingBMC)){
-              var bussesArray = []
+              console.log("got inside if in the loop");
+              var bussesArray = [];
               bussesArray.push({departingBrynMawr: dataFinal[date][index].departingBMC, arrivingAtHaverford: dataFinal[date][index].arrivingHC});
               bussesArray.push({departingBrynMawr: dataFinal[date][index + 1].departingBMC, arrivingAtHaverford: dataFinal[date][index + 1].arrivingHC});
               bussesArray.push({departingBrynMawr: dataFinal[date][index + 2].departingBMC, arrivingAtHaverford: dataFinal[date][index + 2].arrivingHC});
-              return bussesArray
+              console.log("return from betBus: ", bussesArray);
+              return bussesArray;
 
               // return [dataFinal[date][index].departingBMC, dataFinal[date][index + 1].departingBMC, dataFinal[date][index + 2].departingBMC]
           }
       }
   }
-  else if (destination == "BrynMawr"){
+  else if (college == "BrynMawr"){
+    console.log("got inside getBus for BrynMawr");
       for (let index = 0; index < dataFinal[date].length; index ++){
           if (compareTime(time, dataFinal[date][index].departingHC)){
-              var bussesArray = []
+              var bussesArray = [];
               bussesArray.push({departingHaverford: dataFinal[date][index].departingHC, arrivingAtBrynMawr: dataFinal[date][index].arrivingBMC});
               bussesArray.push({departingHaverford: dataFinal[date][index + 1].departingHC, arrivingAtBrynMawr: dataFinal[date][index + 1].arrivingBMC});
               bussesArray.push({departingHaverford: dataFinal[date][index + 2].departingHC, arrivingAtBrynMawr: dataFinal[date][index + 2].arrivingBMC});
-              return bussesArray
+              console.log("return from betBus: ", bussesArray);
+              return bussesArray;
               // return [dataFinal[date][index].departingHC, dataFinal[date][index + 1].departingHC, dataFinal[date][index + 2].departingHC]
           }
       }
   }
+  console.log("didn't get anywhere in getBus :((");
   
 }
 
