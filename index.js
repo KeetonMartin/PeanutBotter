@@ -11,6 +11,51 @@ var dataFinal =  { // 0 is Sunday, 6 is Saturday
   4:[],
   5:[]
 }
+
+async function scrapeProduct(url){
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  await page.goto(url);
+
+  const data = await page.evaluate(() => {
+          const tds = Array.from(document.querySelectorAll('table tr td'))
+          return tds.map(td => td.innerText)
+  });
+
+  data.splice(0,5); // removing the first 5 elements 
+  // console.log(data.length)
+
+  dataFinal = { // 0 is Sunday, 6 is Saturday
+      1:[],
+      2:[],
+      3:[],
+      4:[],
+      5:[]
+  }
+
+  for (let index = 0; index <= 1152; index += 4) {
+      if (index <= 232){
+          dataFinal[1].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
+      }
+      else if (index > 232 && index <= 468){
+          dataFinal[2].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
+      }
+      else if (index > 468 && index <= 704){
+          dataFinal[3].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
+      }
+      else if (index > 704 && index <= 940){
+          dataFinal[4].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
+      }
+      else {
+          dataFinal[5].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
+      }
+  }
+  console.log("done with scraping!");
+  // console.log(dataFinal);
+
+  await browser.close();
+}
+
 express()
   .use(bodyParser.urlencoded({ extended: true }))
   .use(bodyParser.json())
@@ -36,6 +81,11 @@ express()
       day_needed = full_date.getDay();
     }
     let college = req.body.college;
+
+    console.log("day needed: ", day_needed);
+    console.log("full date: ", full_date);
+    console.log("college: ", college);
+    console.log("datetime: ", datetime);
     var resultBusQuery = getBus(day_needed, college, full_date);
     let returnJSON = {
       "messages": [
@@ -164,54 +214,7 @@ let variables_to_text_dictionary = {
   "arrivingAtSwarthmore": "Arriving at Swarthmore: ",
 }
 
-  async function scrapeProduct(url){
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-    await page.goto(url);
 
-    const data = await page.evaluate(() => {
-            const tds = Array.from(document.querySelectorAll('table tr td'))
-            return tds.map(td => td.innerText)
-    });
-
-    data.splice(0,5); // removing the first 5 elements 
-    // console.log(data.length)
-
-    dataFinal = { // 0 is Sunday, 6 is Saturday
-        1:[],
-        2:[],
-        3:[],
-        4:[],
-        5:[]
-    }
-
-    for (let index = 0; index <= 1152; index += 4) {
-        if (index <= 232){
-            dataFinal[1].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
-        }
-        else if (index > 232 && index <= 468){
-            dataFinal[2].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
-        }
-        else if (index > 468 && index <= 704){
-            dataFinal[3].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
-        }
-        else if (index > 704 && index <= 940){
-            dataFinal[4].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
-        }
-        else {
-            dataFinal[5].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
-        }
-    }
-
-    // console.log(dataFinal);
-
-    
-
-    
-
-
-    await browser.close();
-}
 
 scrapeProduct('https://www.brynmawr.edu/transportation/blue-bus-bi-co');
 
