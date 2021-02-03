@@ -5,6 +5,10 @@ const cool = require('cool-ascii-faces');
 const bodyParser = require('body-parser');
 const puppeteer = require('puppeteer');
 var dataFinal = {};
+
+//For Keeton
+const fetch = require('node-fetch');
+
 express()
   .use(bodyParser.urlencoded({ extended: true }))
   .use(bodyParser.json())
@@ -17,33 +21,64 @@ express()
   .get('/lunch', (req, res) => res.send(getLunch()))
   .get('/menu/haverford/todayMenu', (req, res) => res.send(menuHaverfordTodayMenu()))
   .get('/menu/brynmawr/todayMenu', (req, res) => res.send(menuBrynMawrTodayMenu()))
-  .post('/busses', function(req, res) {
-    let current_timestamp = Date.now();
-    var day_needed;
-    var full_date;
-    if(req.body.last_clicked_button_name=="ASAP"){
-      full_date = new Date(current_timestamp);
-      day_needed = full_date.getDay();
-    }
-    else{
-      full_date = new Date(req.body.datetime);
-      day_needed = full_date.getDay();
-    }
-    let college = req.body.college;
-    var resultBusQuery = getBus(day_needed, college, full_date);
-    let returnJSON = {
-      "messages": [
-        {"text": "Here are the next available busses after " + full_date.toUTCString()+ " :"}
-      ]
-     }
-    var text_message = "";
-    for(var i=0; i<resultBusQuery.length; i++){
-        text_message = text_message + resultBusQuery[i];
-     }
-    returnJSON.messages[0].push(text_message);
+  .get('/COVID/haverford', function(req, res) {
+
+    let url = 'https://simplescraper.io/api/vIzhtsVrjPWCS71KNHJ5?apikey=lXsnWlRQFBsWnyWWohEtm9zukMCm2jM6&offset=0&limit=20';
+
+    let composedMessage
+
+    fetch(url)
+    .then(res => res.json())
+    .then((out) => {
+      //JSON result in `out` variable
+
+      console.log('Checkout this JSON! ', out);
+
+      var positiveTests = parseInt(out["data"][0]["Positive Tests"]);
+      console.log('pos tests: ' + positiveTests);
+      var totalTests = parseInt(out["data"][0]["Total Tests"]);
+      var positivityRate = Math.round(positiveTests * 100.0 / totalTests) / 100;
+
+      composedMessage = {
+        "messages": [
+          {"text": "At Haverford, "+ totalTests +" tests have been conducted since the start of the semester."},
+          {"text": "So far, " + totalTests + " of them have been positive with a positivity rate of " + positivityRate}
+        ]
+        };  
+
+      console.log("message out:" + composedMessage["messages"][0]["text"]);
+
+      res.send(composedMessage);
+  })
+
+  })
+  // .post('/busses', function(req, res) {
+  //   let current_timestamp = Date.now();
+  //   var day_needed;
+  //   var full_date;
+  //   if(req.body.last_clicked_button_name=="ASAP"){
+  //     full_date = new Date(current_timestamp);
+  //     day_needed = full_date.getDay();
+  //   }
+  //   else{
+  //     full_date = new Date(req.body.datetime);
+  //     day_needed = full_date.getDay();
+  //   }
+  //   let college = req.body.college;
+  //   var resultBusQuery = getBus(day_needed, college, full_date);
+  //   let returnJSON = {
+  //     "messages": [
+  //       {"text": "Here are the next available busses after " + full_date.toUTCString()+ " :"}
+  //     ]
+  //    }
+  //   var text_message = "";
+  //   for(var i=0; i<resultBusQuery.length; i++){
+  //       text_message = text_message + resultBusQuery[i];
+  //    }
+  //   returnJSON.messages[0].push(text_message);
     
-    console.log(resultJSON);
-    res.send(resultJSON)})
+  //   console.log(resultJSON);
+  //   res.send(resultJSON)})
   .post('/menu', function(req, res) {
     console.log(req);
     console.log(req.body);
@@ -158,56 +193,56 @@ let variables_to_text_dictionary = {
   "arrivingAtSwarthmore": "Arriving at Swarthmore: ",
 }
 
-  async function scrapeProduct(url){
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-    await page.goto(url);
+//   async function scrapeProduct(url){
+//     const browser = await puppeteer.launch();
+//     const page = await browser.newPage();
+//     await page.goto(url);
 
-    const data = await page.evaluate(() => {
-            const tds = Array.from(document.querySelectorAll('table tr td'))
-            return tds.map(td => td.innerText)
-    });
+//     const data = await page.evaluate(() => {
+//             const tds = Array.from(document.querySelectorAll('table tr td'))
+//             return tds.map(td => td.innerText)
+//     });
 
-    data.splice(0,5); // removing the first 5 elements 
-    // console.log(data.length)
+//     data.splice(0,5); // removing the first 5 elements 
+//     // console.log(data.length)
 
-    dataFinal = { // 0 is Sunday, 6 is Saturday
-        1:[],
-        2:[],
-        3:[],
-        4:[],
-        5:[]
-    }
+//     dataFinal = { // 0 is Sunday, 6 is Saturday
+//         1:[],
+//         2:[],
+//         3:[],
+//         4:[],
+//         5:[]
+//     }
 
-    for (let index = 0; index <= 1152; index += 4) {
-        if (index <= 232){
-            dataFinal["Monday"].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
-        }
-        else if (index > 232 && index <= 468){
-            dataFinal["Tuesday"].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
-        }
-        else if (index > 468 && index <= 704){
-            dataFinal["Wednesday"].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
-        }
-        else if (index > 704 && index <= 940){
-            dataFinal["Thursday"].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
-        }
-        else {
-            dataFinal["Friday"].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
-        }
-    }
+//     for (let index = 0; index <= 1152; index += 4) {
+//         if (index <= 232){
+//             dataFinal["Monday"].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
+//         }
+//         else if (index > 232 && index <= 468){
+//             dataFinal["Tuesday"].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
+//         }
+//         else if (index > 468 && index <= 704){
+//             dataFinal["Wednesday"].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
+//         }
+//         else if (index > 704 && index <= 940){
+//             dataFinal["Thursday"].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
+//         }
+//         else {
+//             dataFinal["Friday"].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
+//         }
+//     }
 
-    // console.log(dataFinal);
-
-    
+//     // console.log(dataFinal);
 
     
 
+    
 
-    await browser.close();
-}
 
-scrapeProduct('https://www.brynmawr.edu/transportation/blue-bus-bi-co');
+//     await browser.close();
+// }
+
+// scrapeProduct('https://www.brynmawr.edu/transportation/blue-bus-bi-co');
 
 
 function compareTime(time1, time2) {
