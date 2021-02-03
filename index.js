@@ -77,7 +77,7 @@ express()
       day_needed = full_date.getDay();
     }
     else{
-      full_date = new Date(req.body.datetime);
+      full_date = new Date(req.body.needed_time);
       day_needed = full_date.getDay();
     }
     let college = req.body.college;
@@ -85,7 +85,7 @@ express()
     console.log("day needed: ", day_needed);
     console.log("full date: ", full_date);
     console.log("college: ", college);
-    console.log("datetime: ", datetime);
+    console.log("datetime: ", req.body.needed_time);
     var resultBusQuery = getBus(day_needed, college, full_date);
     let returnJSON = {
       "messages": [
