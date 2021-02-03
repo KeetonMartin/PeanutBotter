@@ -56,7 +56,7 @@ async function scrapeProduct(url){
       }
   }
   console.log("done with scraping!");
-  console.log(dataFinal);
+  // console.log(dataFinal);
   // console.log(dataFinal);
   
   await browser.close();
@@ -158,7 +158,7 @@ express()
     for(var i=0; i<resultBusQuery.length; i++){
         text_message = text_message + resultBusQuery[i];
      }
-    returnJSON.messages[0].push(text_message);
+    returnJSON.messages.push(text_message);
     
     console.log(resultJSON);
     res.send(resultJSON)})
