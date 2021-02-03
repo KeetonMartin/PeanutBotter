@@ -156,9 +156,13 @@ express()
      }
     var text_message = "";
     for(var i=0; i<resultBusQuery.length; i++){
-        text_message = text_message + resultBusQuery[i];
+      for(var key in resultBusQuery[i]) {
+        var value = resultBusQuery[i][key];
+        text_message = text_message + key +": "+value + "\n";
+      };
+      text_message = text_message +"\n";
      }
-    returnJSON.messages.push(text_message);
+    returnJSON.messages.push({"text":text_message});
     
     console.log(returnJSON);
     res.send(returnJSON)})
