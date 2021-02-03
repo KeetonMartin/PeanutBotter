@@ -14,7 +14,54 @@ var dataFinal =  { // 0 is Sunday, 6 is Saturday
   4:[],
   5:[]
 }
+
+var HCDiningFinal = {
+  Breakfast: [],
+  Lunch: [],
+  Dinner: [],
+};
+
 dataFinal = scrapeProduct('https://www.brynmawr.edu/transportation/blue-bus-bi-co');
+HCDiningFinal = scrapeHCDining('https://www.haverford.edu/dining-services/dining-center');
+
+
+async function scrapeHCDining(url){
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  await page.goto(url);
+
+  const data = await page.evaluate(() => {
+          const tds = Array.from(document.querySelectorAll('div.meal-container p'))
+          return tds.map(td => td.innerHTML.split('<br>'))
+  });
+
+  HCDiningFinal = {
+      Breakfast: [],
+      Lunch: [],
+      Dinner: [],
+  };
+
+  let currentDate = new Date();
+
+  if (currentDate.getDay() == 0 || currentDate.getDay() == 6 || (currentDate.getDate() < 8 && currentDate.getMonth() == 1)){
+      data[0].splice(0, 2)
+      data[1].splice(0, 2)
+      HCDiningFinal.Lunch = data[0]
+      HCDiningFinal.Dinner = data[1]
+  }
+  else{
+      data[0].splice(0, 2)
+      data[1].splice(0, 2)
+      data[2].splice(0, 2)
+      HCDiningFinal.Breakfast = data[0]
+      HCDiningFinal.Lunch = data[1]
+      HCDiningFinal.Dinner = data[2]
+  }
+
+  console.log(HCDiningFinal);
+  await browser.close();
+  return HCDiningFinal;
+}
 
 async function scrapeProduct(url){
   // const browser = await puppeteer.launch();
@@ -131,17 +178,16 @@ express()
   //   returnJSON.messages[0].push(text_message);
   .post('/busses', function(req, res) {
     let current_timestamp = Date.now();
-    let etc = current_timestamp.toLocaleString('en-US', { timeZone: 'America/New_York' });
+    // let etc = current_timestamp.toLocaleString('en-US', { timeZone: 'America/New_York' });
     var day_needed;
     var full_date;
     if(req.body.last_clicked_button_name=="ASAP"){
-      full_date = new Date(etc);
+      full_date = new Date();
       day_needed = full_date.getDay();
     }
     else{
       full_date = new Date(req.body.needed_time);
-      etc_needed = full_date.toLocaleString('en-US', { timeZone: 'America/New_York' });
-      full_date = new Date(etc_needed);
+      full_date.setHours(date.getHours() -5);
       day_needed = full_date.getDay();
     }
     let college = req.body.college;
@@ -154,7 +200,7 @@ express()
     console.log("resultBusQuery: ", resultBusQuery);
     let returnJSON = {
       "messages": [
-        {"text": "Here are the next available busses after " + full_date.toLocaleString('en-US', { timeZone: 'America/New_York' })+ " :"}
+        {"text": "Here are the next available busses for the chosen time: \n"}
       ]
      }
     var text_message = "";
@@ -173,8 +219,7 @@ express()
     console.log(req);
     console.log(req.body);
  
-    let current_timestamp = Date.now();
-    let full_date = new Date(current_timestamp);
+    let full_date = new Date();
     let current_hour = full_date.getHours;
     
     let breakfast_start = new Date();
@@ -189,8 +234,8 @@ express()
     
     let dinner_start = new Date();
     let dinner_end = new Date();
-    dinner_start.setHours(16,00,00);
-    dinner_end.setHours(17,29,59);
+    dinner_start.setHours(14,00,00);
+    dinner_end.setHours(20,29,59);
     
     var timezone = req.body.timezone;
     var college = req.body.college;
@@ -198,42 +243,9 @@ express()
 
     
     let menuJSON = {
-      "Haverford":{
-        "breakfast" : `10:00 AM
-        French Toast Sticks
-        Scrambled Eggs
-        Tofu Scrambled
-        Vegan Sausage
-        Sausage Patties
-        Shredded Potato
-        Bagels, Muffins 
-        
-        11:30 AM
-        Beef Burger
-        Beyond Burger
-        Boardwalk Fries
-        Broccoli
-        Pizza`,
-        "lunch" : "None",
-        "dinner" : `Four Cheese Beef Lasagna
-        Spaghetti Squash Primavera
-        Potatoes Parmesan
-        Ratatouille
-        Garlic Bread
-        Grilled Chicken Breast
-        Pasta & Sauce
-        Pizza`,
-      },
-      "Swarthmore":{
-      "breakfast":"Eggs, bacon",
-      "lunch": "Chicken noodle soup",
-      "dinner": "Pesto pasta, salmon"
-      },
-      "BrynMawr":{
-        "breakfast": "Pancakes",
-        "lunch": "Mushroom cream soup",
-        "dinner": "Tacos"
-      }
+      "Haverford":HCDiningFinal,
+      "BrynMawr": {},
+      "Swarthmore": {}
     };
 
 

@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 
-async function scrapeProduct(url){
+async function scrapeHCDining(url){
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
     await page.goto(url);
@@ -37,4 +37,4 @@ async function scrapeProduct(url){
     await browser.close();
 }
 
-scrapeProduct('https://www.haverford.edu/dining-services/dining-center');
+scrapeHCDining('https://www.haverford.edu/dining-services/dining-center');
