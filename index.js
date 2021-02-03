@@ -17,7 +17,8 @@ var dataFinal =  { // 0 is Sunday, 6 is Saturday
 dataFinal = scrapeProduct('https://www.brynmawr.edu/transportation/blue-bus-bi-co');
 
 async function scrapeProduct(url){
-  const browser = await puppeteer.launch();
+  // const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({ignoreDefaultArgs: ['--disable-extensions']});
   const page = await browser.newPage();
   await page.goto(url);
 
