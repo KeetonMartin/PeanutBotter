@@ -131,14 +131,17 @@ express()
   //   returnJSON.messages[0].push(text_message);
   .post('/busses', function(req, res) {
     let current_timestamp = Date.now();
+    let etc = current_timestamp.toLocaleString('en-US', { timeZone: 'America/New_York' });
     var day_needed;
     var full_date;
     if(req.body.last_clicked_button_name=="ASAP"){
-      full_date = new Date(current_timestamp);
+      full_date = new Date(etc);
       day_needed = full_date.getDay();
     }
     else{
       full_date = new Date(req.body.needed_time);
+      etc_needed = full_date.toLocaleString('en-US', { timeZone: 'America/New_York' });
+      full_date = new Date(etc_needed);
       day_needed = full_date.getDay();
     }
     let college = req.body.college;
@@ -151,14 +154,14 @@ express()
     console.log("resultBusQuery: ", resultBusQuery);
     let returnJSON = {
       "messages": [
-        {"text": "Here are the next available busses after " + full_date.toUTCString()+ " :"}
+        {"text": "Here are the next available busses after " + full_date.toLocaleString('en-US', { timeZone: 'America/New_York' })+ " :"}
       ]
      }
     var text_message = "";
     for(var i=0; i<resultBusQuery.length; i++){
       for(var key in resultBusQuery[i]) {
         var value = resultBusQuery[i][key];
-        text_message = text_message + key +": "+value + "\n";
+        text_message = text_message + variables_to_text_dictionary[key] +": "+value + "\n";
       };
       text_message = text_message +"\n";
      }
