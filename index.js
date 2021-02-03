@@ -4,7 +4,7 @@ const PORT = process.env.PORT || 5000
 const cool = require('cool-ascii-faces');
 const bodyParser = require('body-parser');
 const puppeteer = require('puppeteer');
-var dataFinal =  { // 0 is Sunday, 6 is Saturday
+let dataFinal =  { // 0 is Sunday, 6 is Saturday
   1:[],
   2:[],
   3:[],
