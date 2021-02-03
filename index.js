@@ -160,8 +160,8 @@ express()
      }
     returnJSON.messages.push(text_message);
     
-    console.log(resultJSON);
-    res.send(resultJSON)})
+    console.log(returnJSON);
+    res.send(returnJSON)})
   .post('/menu', function(req, res) {
     console.log(req);
     console.log(req.body);
@@ -298,7 +298,7 @@ function compareTime(time1, time2) {
           t1.setHours(time2[0], time2[2]+time2[3], 0);
       }
   }
-  console.log("return from compareTime: ", time1 < t1);
+  // console.log("return from compareTime: ", time1 < t1);
   return time1 < t1;
   
 }
@@ -306,16 +306,16 @@ function compareTime(time1, time2) {
 function getBus(date, college, time) {
   console.log(college);
   if (college == "Haverford"){
-    console.log("got inside getBus for Haverford");
-    console.log("dataFinal: ", dataFinal);
+    // console.log("got inside getBus for Haverford");
+    // console.log("dataFinal: ", dataFinal);
       for (let index = 0; index < dataFinal[date].length; index ++){
           if (compareTime(time, dataFinal[date][index].departingBMC)){
-              console.log("got inside if in the loop");
+              // console.log("got inside if in the loop");
               var bussesArray = [];
               bussesArray.push({departingBrynMawr: dataFinal[date][index].departingBMC, arrivingAtHaverford: dataFinal[date][index].arrivingHC});
               bussesArray.push({departingBrynMawr: dataFinal[date][index + 1].departingBMC, arrivingAtHaverford: dataFinal[date][index + 1].arrivingHC});
               bussesArray.push({departingBrynMawr: dataFinal[date][index + 2].departingBMC, arrivingAtHaverford: dataFinal[date][index + 2].arrivingHC});
-              console.log("return from betBus: ", bussesArray);
+              // console.log("return from betBus: ", bussesArray);
               return bussesArray;
 
               // return [dataFinal[date][index].departingBMC, dataFinal[date][index + 1].departingBMC, dataFinal[date][index + 2].departingBMC]
@@ -323,14 +323,14 @@ function getBus(date, college, time) {
       }
   }
   else if (college == "BrynMawr"){
-    console.log("got inside getBus for BrynMawr");
+    // console.log("got inside getBus for BrynMawr");
       for (let index = 0; index < dataFinal[date].length; index ++){
           if (compareTime(time, dataFinal[date][index].departingHC)){
               var bussesArray = [];
               bussesArray.push({departingHaverford: dataFinal[date][index].departingHC, arrivingAtBrynMawr: dataFinal[date][index].arrivingBMC});
               bussesArray.push({departingHaverford: dataFinal[date][index + 1].departingHC, arrivingAtBrynMawr: dataFinal[date][index + 1].arrivingBMC});
               bussesArray.push({departingHaverford: dataFinal[date][index + 2].departingHC, arrivingAtBrynMawr: dataFinal[date][index + 2].arrivingBMC});
-              console.log("return from betBus: ", bussesArray);
+              // console.log("return from betBus: ", bussesArray);
               return bussesArray;
               // return [dataFinal[date][index].departingHC, dataFinal[date][index + 1].departingHC, dataFinal[date][index + 2].departingHC]
           }
