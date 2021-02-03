@@ -19,7 +19,7 @@ express()
   .get('/menu/brynmawr/todayMenu', (req, res) => res.send(menuBrynMawrTodayMenu()))
   .post('/menu', function(req, res) {
 
-    console.log(body);
+ 
     
     
     var timezone = req.body.timezone;
