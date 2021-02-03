@@ -4,7 +4,13 @@ const PORT = process.env.PORT || 5000
 const cool = require('cool-ascii-faces');
 const bodyParser = require('body-parser');
 const puppeteer = require('puppeteer');
-var dataFinal = {};
+var dataFinal =  { // 0 is Sunday, 6 is Saturday
+  1:[],
+  2:[],
+  3:[],
+  4:[],
+  5:[]
+}
 express()
   .use(bodyParser.urlencoded({ extended: true }))
   .use(bodyParser.json())
@@ -181,19 +187,19 @@ let variables_to_text_dictionary = {
 
     for (let index = 0; index <= 1152; index += 4) {
         if (index <= 232){
-            dataFinal["Monday"].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
+            dataFinal[1].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
         }
         else if (index > 232 && index <= 468){
-            dataFinal["Tuesday"].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
+            dataFinal[2].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
         }
         else if (index > 468 && index <= 704){
-            dataFinal["Wednesday"].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
+            dataFinal[3].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
         }
         else if (index > 704 && index <= 940){
-            dataFinal["Thursday"].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
+            dataFinal[4].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
         }
         else {
-            dataFinal["Friday"].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
+            dataFinal[5].push({departingBMC:data[index], arrivingHC: data[index + 1], departingHC: data[index + 2], arrivingBMC: data[index + 3]});
         }
     }
 
