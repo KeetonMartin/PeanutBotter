@@ -3,6 +3,10 @@ const path = require('path')
 const PORT = process.env.PORT || 5000
 const cool = require('cool-ascii-faces');
 const bodyParser = require('body-parser');
+const app = express();
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 express()
   .use(bodyParser)
