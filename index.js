@@ -96,7 +96,7 @@ express()
       composedMessage = {
         "messages": [
           {"text": "At Haverford, "+ totalTests +" tests have been conducted since the start of the semester."},
-          {"text": "So far, " + totalTests + " of them have been positive with a positivity rate of " + positivityRate}
+          {"text": "So far, " + positiveTests + " of them have been positive with a positivity rate of " + positivityRate}
         ]
         };  
 
