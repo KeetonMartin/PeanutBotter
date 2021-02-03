@@ -11,6 +11,7 @@ var dataFinal =  { // 0 is Sunday, 6 is Saturday
   4:[],
   5:[]
 }
+dataFinal = scrapeProduct('https://www.brynmawr.edu/transportation/blue-bus-bi-co');
 
 async function scrapeProduct(url){
   const browser = await puppeteer.launch();
@@ -51,9 +52,11 @@ async function scrapeProduct(url){
       }
   }
   console.log("done with scraping!");
+  console.log(dataFinal);
   // console.log(dataFinal);
-
+  
   await browser.close();
+  return dataFinal;
 }
 
 express()
@@ -217,7 +220,7 @@ let variables_to_text_dictionary = {
 
 
 
-scrapeProduct('https://www.brynmawr.edu/transportation/blue-bus-bi-co');
+
 
 
 function compareTime(time1, time2) {
