@@ -26,7 +26,8 @@ HCDiningFinal = scrapeHCDining('https://www.haverford.edu/dining-services/dining
 
 
 async function scrapeHCDining(url){
-  const browser = await puppeteer.launch();
+  console.log("start dc scraping");
+  const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
   const page = await browser.newPage();
   await page.goto(url);
 
@@ -42,20 +43,22 @@ async function scrapeHCDining(url){
   };
 
   let currentDate = new Date();
+  currentDate.setHours(currentDate.getHours() - 5);
 
   if (currentDate.getDay() == 0 || currentDate.getDay() == 6 || (currentDate.getDate() < 8 && currentDate.getMonth() == 1)){
-      data[0].splice(0, 2)
-      data[1].splice(0, 2)
-      HCDiningFinal.lunch = data[0]
-      HCDiningFinal.dinner = data[1]
+      data[0].splice(0, 2);
+      data[1].splice(0, 2);
+      HCDiningFinal.breakfast = "Sorry, no breakfast today!";
+      HCDiningFinal.lunch = data[0].toString();
+      HCDiningFinal.dinner = data[1].toString();
   }
   else{
-      data[0].splice(0, 2)
-      data[1].splice(0, 2)
-      data[2].splice(0, 2)
-      HCDiningFinal.breakfast = data[0]
-      HCDiningFinal.lunch = data[1]
-      HCDiningFinal.dinner = data[2]
+      data[0].splice(0, 2);
+      data[1].splice(0, 2);
+      data[2].splice(0, 2);
+      HCDiningFinal.breakfast = data[0].toString();
+      HCDiningFinal.lunch = data[1].toString();
+      HCDiningFinal.dinner = data[2].toString();
   }
 
   console.log(HCDiningFinal);
@@ -183,11 +186,13 @@ express()
     var full_date;
     if(req.body.last_clicked_button_name=="ASAP"){
       full_date = new Date();
+      full_date.setHours(full_date.getHours() - 5);
       day_needed = full_date.getDay();
+      
     }
     else{
       full_date = new Date(req.body.needed_time);
-      full_date.setHours(full_date.getHours() -5);
+      full_date.setHours(full_date.getHours() - 5);
       day_needed = full_date.getDay();
     }
     let college = req.body.college;
@@ -220,22 +225,35 @@ express()
     // console.log(req.body);
  
     let full_date = new Date();
-    let current_hour = full_date.getHours;
+    full_date.setHours(full_date.getHours() - 5);
+    let current_hour = full_date.getHours();
+    
     
     let breakfast_start = new Date();
     let breakfast_end = new Date();
     breakfast_start.setHours(10,00,00);
+    breakfast_start.setHours(breakfast_start.getHours() - 5);
     breakfast_end.setHours(10,59,59);
+    breakfast_end.setHours(breakfast_end.getHours() - 5);
+
 
     let lunch_start = new Date();
     let lunch_end = new Date();
     lunch_start.setHours(11,00,00);
+    lunch_start.setHours(lunch_start.getHours() - 5);
+
     lunch_end.setHours(13,29,59);
+    lunch_end.setHours(lunch_end.getHours() - 5);
+
     
     let dinner_start = new Date();
     let dinner_end = new Date();
     dinner_start.setHours(14,00,00);
+    dinner_start.setHours(dinner_start.getHours() - 5);
+
     dinner_end.setHours(20,29,59);
+    dinner_end.setHours(dinner_end.getHours() - 5);
+
     
     var timezone = req.body.timezone;
     var college = req.body.college;

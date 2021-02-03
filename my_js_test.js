@@ -1,5 +1,9 @@
-let current_timestamp = Date.now();
-let full_date = new Date(current_timestamp);
+
+let full_date = new Date();
+console.log(full_date);
+
+full_date.setHours(full_date.getHours() - 5);
+console.log(full_date);
 let current_hour = full_date.getHours;
 
 let breakfast_start = new Date();
