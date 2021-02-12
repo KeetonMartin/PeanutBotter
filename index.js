@@ -342,7 +342,7 @@ function compareTime(time1, time2) {
 
 function getBus(date, college, time) {
   console.log(college);
-  if (college == "Haverford"){
+  if (college == "BrynMawr"){
     // console.log("got inside getBus for Haverford");
     // console.log("dataFinal: ", dataFinal);
       for (let index = 0; index < dataFinal[date].length; index ++){
@@ -359,7 +359,7 @@ function getBus(date, college, time) {
           }
       }
   }
-  else if (college == "BrynMawr"){
+  else if (college == "Haverford"){
     // console.log("got inside getBus for BrynMawr");
       for (let index = 0; index < dataFinal[date].length; index ++){
           if (compareTime(time, dataFinal[date][index].departingHC)){
