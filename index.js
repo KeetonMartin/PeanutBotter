@@ -30,15 +30,12 @@ async function scrapeHCDining(url){
   const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
   const page = await browser.newPage();
   await page.goto(url);
-
   const data = await page.evaluate(() => {
           const tds = Array.from(document.querySelectorAll('div.meal-container p'))
-          return tds.map(td => td.innerText.split('\n'))
+          return tds.map(td => td.innerHTML.split('\n'))
   });
 
-
-
-  dataFinal = {
+  HCDiningFinal = {
       Breakfast: [],
       Lunch: [],
       Dinner: [],
@@ -46,26 +43,24 @@ async function scrapeHCDining(url){
   };
 
   let currentDate = new Date();
-
+  currentDate.setHours(currentDate.getHours() - 5);
   if (currentDate.getDay() == 0 || currentDate.getDay() == 6){
-      data[0].splice(0, 3);
-      data[1].splice(0, 1);
-      dataFinal.Lunch = data[0].toString();
-      dataFinal.Dinner = data[1].toString();
-      dataFinal.FullDay = "Lunch: \n" + dataFinal.Lunch + "; \n" + "Dinner: \n" + dataFinal.Dinner;
+    data[0].splice(0, 3);
+    data[1].splice(0, 1);
+    HCDiningFinal.Lunch = data[0].toString();
+    HCDiningFinal.Dinner = data[1].toString();
+    HCDiningFinal.FullDay = "Lunch: \n" + HCDiningFinal.Lunch + "; \n" + "Dinner: \n" + HCDiningFinal.Dinner;
   }
   else{
       data[0].splice(0, 3);
       data[1].splice(0, 1);
       data[2].splice(0, 1);
-      dataFinal.Breakfast = data[0].toString();
-      dataFinal.Lunch = data[1].toString();
-      dataFinal.Dinner = data[2].toString();
-      dataFinal.FullDay = "Breakfast: \n" + dataFinal.Breakfast + "; \n" + "Lunch: \n" + dataFinal.Lunch + "; \n" + "Dinner: \n" + dataFinal.Dinner; 
+      HCDiningFinal.Breakfast = data[0].toString();
+      HCDiningFinal.Lunch = data[1].toString();
+      HCDiningFinal.Dinner = data[2].toString();
+      HCDiningFinal.FullDay = "Breakfast: \n" + HCDiningFinal.Breakfast + "; \n" + "Lunch: \n" + HCDiningFinal.Lunch + "; \n" + "Dinner: \n" + HCDiningFinal.Dinner;
   }
-
-  console.log(dataFinal);
-  console.log(data[0].toString());
+  console.log(HCDiningFinal);
   await browser.close();
   return HCDiningFinal;
 }
@@ -236,27 +231,27 @@ express()
     let breakfast_start = new Date();
     let breakfast_end = new Date();
     breakfast_start.setHours(7,30,00);
-    breakfast_start.setHours(breakfast_start.getHours() - 5);
+    // breakfast_start.setHours(breakfast_start.getHours() - 5);
     breakfast_end.setHours(10,59,59);
-    breakfast_end.setHours(breakfast_end.getHours() - 5);
+    // breakfast_end.setHours(breakfast_end.getHours() - 5);
     console.log("In menu POST request, breakfast_start = ", breakfast_start);
 
     let lunch_start = new Date();
     let lunch_end = new Date();
     lunch_start.setHours(11,00,00);
-    lunch_start.setHours(lunch_start.getHours() - 5);
+    // lunch_start.setHours(lunch_start.getHours() - 5);
 
     lunch_end.setHours(13,59,59);
-    lunch_end.setHours(lunch_end.getHours() - 5);
+    // lunch_end.setHours(lunch_end.getHours() - 5);
 
     
     let dinner_start = new Date();
     let dinner_end = new Date();
     dinner_start.setHours(17,00,00);
-    dinner_start.setHours(dinner_start.getHours() - 5);
+    // dinner_start.setHours(dinner_start.getHours() - 5);
 
-    dinner_end.setHours(18,59,59);
-    dinner_end.setHours(dinner_end.getHours() - 5);
+    dinner_end.setHours(23,59,59);
+    // dinner_end.setHours(dinner_end.getHours() - 5);
 
     
     var timezone = req.body.timezone;
