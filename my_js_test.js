@@ -23,30 +23,9 @@ dinner_end.setHours(17,29,59);
 
 let menuJSON = {
     "Haverford":{
-      "breakfast" : `10:00 AM
-      French Toast Sticks
-      Scrambled Eggs
-      Tofu Scrambled
-      Vegan Sausage
-      Sausage Patties
-      Shredded Potato
-      Bagels, Muffins 
-      
-      11:30 AM
-      Beef Burger
-      Beyond Burger
-      Boardwalk Fries
-      Broccoli
-      Pizza`,
-      "lunch" : "None",
-      "dinner" : `Four Cheese Beef Lasagna
-      Spaghetti Squash Primavera
-      Potatoes Parmesan
-      Ratatouille
-      Garlic Bread
-      Grilled Chicken Breast
-      Pasta & Sauce
-      Pizza`,
+      "breakfast" : `Pancakes, Scrambled Eggs, Tofu Scrambled, Vegan Sausage, Turkey Sausage Links, Diced Potatoes, Bagels, Muffins`,
+      "lunch" : `Grilled Turkey & Swiss Sundried Tomato Melt, Singapore Street Noodles, Roasted Red Potatoes, Roasted Vegetables, Pizza`,
+      "dinner" : `Grilled Flank Steak Chimichurri, Cauliflower Rice Burrito Skillet, Mexican Corn, Chipotle Roasted Potatoes, Grilled Chicken Breast, Pasta & Sauce, Pizza`,
     },
   "Swarthmore":{
     "breakfast":"Eggs, bacon",
