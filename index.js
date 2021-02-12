@@ -125,6 +125,35 @@ express()
   .get('/lunch', (req, res) => res.send(getLunch()))
   .get('/menu/haverford/todayMenu', (req, res) => res.send(menuHaverfordTodayMenu()))
   .get('/menu/brynmawr/todayMenu', (req, res) => res.send(menuBrynMawrTodayMenu()))
+  .get('/COVID/brynmawr', function(req, res) {
+    let url = 'https://simplescraper.io/api/XDu56L5tIhrUQoZbmSoq?apikey=lXsnWlRQFBsWnyWWohEtm9zukMCm2jM6&offset=0&limit=20';
+
+    let composedMessage
+
+    fetch(url)
+    .then(res => res.json())
+    .then((out) => {
+      //JSON result in `out` variable
+
+      console.log('Checkout this JSON! ', out);
+
+      var positiveTests = parseInt(out["data"][0]["posTestsScreen"]);
+      console.log('pos tests: ' + positiveTests);
+      var totalTests = parseInt(out["data"][0]["totalTests"]);
+      var positivityRate = Math.round(positiveTests * 10000.0 / totalTests) / 10000;
+
+      composedMessage = {
+        "messages": [
+          {"text": "At Bryn Mawr, "+ totalTests +" tests have been conducted since the start of the semester."},
+          {"text": "So far, " + positiveTests + " of them have been positive with a positivity rate of " + positivityRate}
+        ]
+        };  
+
+        console.log("message out:" + composedMessage["messages"][0]["text"]);
+
+        res.send(composedMessage);
+      })
+  })
   .get('/COVID/haverford', function(req, res) {
 
     let url = 'https://simplescraper.io/api/vIzhtsVrjPWCS71KNHJ5?apikey=lXsnWlRQFBsWnyWWohEtm9zukMCm2jM6&offset=0&limit=20';
