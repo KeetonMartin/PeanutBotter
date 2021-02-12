@@ -141,7 +141,7 @@ express()
       var positiveTests = parseInt(out["data"][0]["Positive Tests"]);
       console.log('pos tests: ' + positiveTests);
       var totalTests = parseInt(out["data"][0]["Total Tests"]);
-      var positivityRate = Math.round(positiveTests * 100.0 / totalTests) / 100;
+      var positivityRate = Math.round(positiveTests * 10000.0 / totalTests) / 10000;
 
       composedMessage = {
         "messages": [
