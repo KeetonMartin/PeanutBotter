@@ -33,35 +33,39 @@ async function scrapeHCDining(url){
 
   const data = await page.evaluate(() => {
           const tds = Array.from(document.querySelectorAll('div.meal-container p'))
-          return tds.map(td => td.innerHTML.split('<br>'))
+          return tds.map(td => td.innerText.split('\n'))
   });
 
-  HCDiningFinal = {
-      breakfast: [],
-      lunch: [],
-      dinner: [],
+
+
+  dataFinal = {
+      Breakfast: [],
+      Lunch: [],
+      Dinner: [],
+      FullDay:[]
   };
 
   let currentDate = new Date();
-  currentDate.setHours(currentDate.getHours() - 5);
 
-  if (currentDate.getDay() == 0 || currentDate.getDay() == 6 || (currentDate.getDate() < 8 && currentDate.getMonth() == 1)){
-      data[0].splice(0, 2);
-      data[1].splice(0, 2);
-      HCDiningFinal.breakfast = "Sorry, no breakfast today!";
-      HCDiningFinal.lunch = data[0].toString();
-      HCDiningFinal.dinner = data[1].toString();
+  if (currentDate.getDay() == 0 || currentDate.getDay() == 6){
+      data[0].splice(0, 3);
+      data[1].splice(0, 1);
+      dataFinal.Lunch = data[0].toString();
+      dataFinal.Dinner = data[1].toString();
+      dataFinal.FullDay = "Lunch: \n" + dataFinal.Lunch + "; \n" + "Dinner: \n" + dataFinal.Dinner;
   }
   else{
-      data[0].splice(0, 2);
-      data[1].splice(0, 2);
-      data[2].splice(0, 2);
-      HCDiningFinal.breakfast = data[0].toString();
-      HCDiningFinal.lunch = data[1].toString();
-      HCDiningFinal.dinner = data[2].toString();
+      data[0].splice(0, 3);
+      data[1].splice(0, 1);
+      data[2].splice(0, 1);
+      dataFinal.Breakfast = data[0].toString();
+      dataFinal.Lunch = data[1].toString();
+      dataFinal.Dinner = data[2].toString();
+      dataFinal.FullDay = "Breakfast: \n" + dataFinal.Breakfast + "; \n" + "Lunch: \n" + dataFinal.Lunch + "; \n" + "Dinner: \n" + dataFinal.Dinner; 
   }
 
-  console.log(HCDiningFinal);
+  console.log(dataFinal);
+  console.log(data[0].toString());
   await browser.close();
   return HCDiningFinal;
 }
@@ -73,8 +77,8 @@ async function scrapeProduct(url){
   await page.goto(url);
 
   const data = await page.evaluate(() => {
-          const tds = Array.from(document.querySelectorAll('table tr td'))
-          return tds.map(td => td.innerText)
+          const tds = Array.from(document.querySelectorAll('table tr td'));
+          return tds.map(td => td.innerText);
   });
 
   data.splice(0,5); // removing the first 5 elements 
@@ -227,31 +231,31 @@ express()
     let full_date = new Date();
     full_date.setHours(full_date.getHours() - 5);
     let current_hour = full_date.getHours();
-    
+    console.log("In menu POST request, full_date = ", full_date);
     
     let breakfast_start = new Date();
     let breakfast_end = new Date();
-    breakfast_start.setHours(10,00,00);
+    breakfast_start.setHours(7,30,00);
     breakfast_start.setHours(breakfast_start.getHours() - 5);
     breakfast_end.setHours(10,59,59);
     breakfast_end.setHours(breakfast_end.getHours() - 5);
-
+    console.log("In menu POST request, breakfast_start = ", breakfast_start);
 
     let lunch_start = new Date();
     let lunch_end = new Date();
     lunch_start.setHours(11,00,00);
     lunch_start.setHours(lunch_start.getHours() - 5);
 
-    lunch_end.setHours(13,29,59);
+    lunch_end.setHours(13,59,59);
     lunch_end.setHours(lunch_end.getHours() - 5);
 
     
     let dinner_start = new Date();
     let dinner_end = new Date();
-    dinner_start.setHours(14,00,00);
+    dinner_start.setHours(17,00,00);
     dinner_start.setHours(dinner_start.getHours() - 5);
 
-    dinner_end.setHours(20,29,59);
+    dinner_end.setHours(18,59,59);
     dinner_end.setHours(dinner_end.getHours() - 5);
 
     
@@ -275,26 +279,19 @@ express()
 
 
     if(time_to_show=="Full menu today"){ // Show full day menu
-      returnJSON.messages[0].text = "Breakfast:\n" + menuJSON[college].breakfast + "\n\nLunch:\n" + menuJSON[college].lunch + "\n\nDinner:\n" + menuJSON[college].dinner;
+      returnJSON.messages[0].text = menuJSON[college].FullDay;
     }
     else{ // Show menu at the current time
 
       if(current_hour>=breakfast_start && current_hour<breakfast_end) { // breakfast time
-        returnJSON.messages[0].text = "Breakfast:\n"+menuJSON[college].breakfast;
-      }else{
-        if(current_hour>=lunch_start && current_hour<lunch_end) { // lunch time
-          returnJSON.messages[0].text = "Lunch:\n"+menuJSON[college].lunch;
-        }
-        else{
-          if(current_hour>=dinner_start && current_hour<dinner_end) { // dinner time
-            returnJSON.messages[0].text = "Dinner:\n"+menuJSON[college].dinner;
-          }
-          else{
+        returnJSON.messages[0].text = "Breakfast:\n"+menuJSON[college].Breakfast;
+      } else if(current_hour>=lunch_start && current_hour<lunch_end) { // lunch time
+          returnJSON.messages[0].text = "Lunch:\n"+menuJSON[college].Lunch;
+      } else if(current_hour>=dinner_start && current_hour<dinner_end) { // dinner time
+            returnJSON.messages[0].text = "Dinner:\n"+menuJSON[college].Dinner;
+      } else{
             returnJSON.messages[0].text = "Sorry! The dining center is closed right now :(";
-          }
-        }
       }
-      
     };
 
 
@@ -343,7 +340,7 @@ function compareTime(time1, time2) {
 function getBus(date, college, time) {
   console.log(college);
   if (college == "BrynMawr"){
-    // console.log("got inside getBus for Haverford");
+    // console.log("got inside getBus for BrynMawr");
     // console.log("dataFinal: ", dataFinal);
       for (let index = 0; index < dataFinal[date].length; index ++){
           if (compareTime(time, dataFinal[date][index].departingBMC)){
@@ -360,7 +357,7 @@ function getBus(date, college, time) {
       }
   }
   else if (college == "Haverford"){
-    // console.log("got inside getBus for BrynMawr");
+    // console.log("got inside getBus for Haverford");
       for (let index = 0; index < dataFinal[date].length; index ++){
           if (compareTime(time, dataFinal[date][index].departingHC)){
               var bussesArray = [];
